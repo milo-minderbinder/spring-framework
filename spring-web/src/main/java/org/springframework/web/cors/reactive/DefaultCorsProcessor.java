@@ -140,7 +140,13 @@ public class DefaultCorsProcessor implements CorsProcessor {
 		}
 
 		if (Boolean.TRUE.equals(config.getAllowCredentials())) {
-			responseHeaders.setAccessControlAllowCredentials(true);
+			if (allowOrigin.equals(CorsConfiguration.ALL)) {
+				logger.warn("Cannot set Access-Control-Allow-Credentials header to \"true\" when " +
+						"Access-Control-Allow-Origin header is set to \"*\" " +
+						"(see note in section #6.1.3 of the specification: https://www.w3.org/TR/cors/#supports-credentials");
+			} else {
+				responseHeaders.setAccessControlAllowCredentials(true);
+			}
 		}
 
 		if (preFlightRequest && config.getMaxAge() != null) {

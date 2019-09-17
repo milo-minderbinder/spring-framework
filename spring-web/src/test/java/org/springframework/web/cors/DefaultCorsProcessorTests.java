@@ -146,7 +146,25 @@ public class DefaultCorsProcessorTests {
 
 		this.processor.processRequest(this.conf, this.request, this.response);
 		assertThat(this.response.containsHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN)).isTrue();
-		assertThat(this.response.getHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN)).isEqualTo("https://domain2.com");
+		assertThat(this.response.getHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN)).isEqualTo("*");
+		assertThat(this.response.containsHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS)).isFalse();
+		assertThat(this.response.getHeaders(HttpHeaders.VARY)).contains(HttpHeaders.ORIGIN,
+				HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS);
+		assertThat(this.response.getStatus()).isEqualTo(HttpServletResponse.SC_OK);
+	}
+
+	@Test
+	public void actualRequestCredentialsWithOriginWildcardAndWhitelisted() throws Exception {
+		this.request.setMethod(HttpMethod.GET.name());
+		this.request.addHeader(HttpHeaders.ORIGIN, "https://domain1.com");
+		this.conf.addAllowedOrigin("https://domain1.com");
+		this.conf.addAllowedOrigin("*");
+		this.conf.addAllowedOrigin("http://domain3.example");
+		this.conf.setAllowCredentials(true);
+
+		this.processor.processRequest(this.conf, this.request, this.response);
+		assertThat(this.response.containsHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN)).isTrue();
+		assertThat(this.response.getHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN)).isEqualTo("https://domain1.com");
 		assertThat(this.response.containsHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS)).isTrue();
 		assertThat(this.response.getHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS)).isEqualTo("true");
 		assertThat(this.response.getHeaders(HttpHeaders.VARY)).contains(HttpHeaders.ORIGIN,
@@ -324,7 +342,27 @@ public class DefaultCorsProcessorTests {
 
 		this.processor.processRequest(this.conf, this.request, this.response);
 		assertThat(this.response.containsHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN)).isTrue();
-		assertThat(this.response.getHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN)).isEqualTo("https://domain2.com");
+		assertThat(this.response.getHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN)).isEqualTo("*");
+		assertThat(this.response.getHeaders(HttpHeaders.VARY)).contains(HttpHeaders.ORIGIN,
+				HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS);
+		assertThat(this.response.getStatus()).isEqualTo(HttpServletResponse.SC_OK);
+	}
+
+	@Test
+	public void preflightRequestCredentialsWithOriginWildcardAndWhitelisted() throws Exception {
+		this.request.setMethod(HttpMethod.OPTIONS.name());
+		this.request.addHeader(HttpHeaders.ORIGIN, "https://domain1.com");
+		this.request.addHeader(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "GET");
+		this.request.addHeader(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, "Header1");
+		this.conf.addAllowedOrigin("https://domain1.com");
+		this.conf.addAllowedOrigin("*");
+		this.conf.addAllowedOrigin("http://domain3.example");
+		this.conf.addAllowedHeader("Header1");
+		this.conf.setAllowCredentials(true);
+
+		this.processor.processRequest(this.conf, this.request, this.response);
+		assertThat(this.response.containsHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN)).isTrue();
+		assertThat(this.response.getHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN)).isEqualTo("https://domain1.com");
 		assertThat(this.response.getHeaders(HttpHeaders.VARY)).contains(HttpHeaders.ORIGIN,
 				HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS);
 		assertThat(this.response.getStatus()).isEqualTo(HttpServletResponse.SC_OK);

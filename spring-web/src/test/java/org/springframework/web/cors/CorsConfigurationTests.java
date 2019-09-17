@@ -217,6 +217,9 @@ public class CorsConfigurationTests {
 		config.setAllowedOrigins(Arrays.asList("*"));
 		assertThat(config.checkOrigin("https://domain.com")).isEqualTo("*");
 		config.setAllowCredentials(true);
+		assertThat(config.checkOrigin("https://domain.com")).isEqualTo("*");
+		config.setAllowedOrigins(Arrays.asList("https://domain.com", "*"));
+		assertThat(config.checkOrigin("https://otherdomain.com")).isEqualTo("*");
 		assertThat(config.checkOrigin("https://domain.com")).isEqualTo("https://domain.com");
 		config.setAllowedOrigins(Arrays.asList("https://domain.com"));
 		assertThat(config.checkOrigin("https://domain.com")).isEqualTo("https://domain.com");

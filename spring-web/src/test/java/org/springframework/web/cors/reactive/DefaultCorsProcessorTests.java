@@ -152,6 +152,25 @@ public class DefaultCorsProcessorTests {
 
 		ServerHttpResponse response = exchange.getResponse();
 		assertThat(response.getHeaders().containsKey(ACCESS_CONTROL_ALLOW_ORIGIN)).isTrue();
+		assertThat(response.getHeaders().getFirst(ACCESS_CONTROL_ALLOW_ORIGIN)).isEqualTo("*");
+		assertThat(response.getHeaders().containsKey(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS)).isFalse();
+		assertThat(response.getHeaders().get(VARY)).contains(ORIGIN,
+				ACCESS_CONTROL_REQUEST_METHOD, ACCESS_CONTROL_REQUEST_HEADERS);
+		assertThat((Object) response.getStatusCode()).isNull();
+	}
+
+	@Test
+	public void actualRequestCredentialsWithOriginWildcardAndWhitelisted() throws Exception {
+		ServerWebExchange exchange = actualRequest();
+		this.conf.addAllowedOrigin("https://domain1.com");
+		this.conf.addAllowedOrigin("*");
+		this.conf.addAllowedOrigin("https://domain2.com");
+		this.conf.addAllowedOrigin("http://domain3.example");
+		this.conf.setAllowCredentials(true);
+		this.processor.process(this.conf, exchange);
+
+		ServerHttpResponse response = exchange.getResponse();
+		assertThat(response.getHeaders().containsKey(ACCESS_CONTROL_ALLOW_ORIGIN)).isTrue();
 		assertThat(response.getHeaders().getFirst(ACCESS_CONTROL_ALLOW_ORIGIN)).isEqualTo("https://domain2.com");
 		assertThat(response.getHeaders().containsKey(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS)).isTrue();
 		assertThat(response.getHeaders().getFirst(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS)).isEqualTo("true");
@@ -330,6 +349,29 @@ public class DefaultCorsProcessorTests {
 
 		this.conf.addAllowedOrigin("https://domain1.com");
 		this.conf.addAllowedOrigin("*");
+		this.conf.addAllowedOrigin("http://domain3.example");
+		this.conf.addAllowedHeader("Header1");
+		this.conf.setAllowCredentials(true);
+
+		this.processor.process(this.conf, exchange);
+
+		ServerHttpResponse response = exchange.getResponse();
+		assertThat(response.getHeaders().containsKey(ACCESS_CONTROL_ALLOW_ORIGIN)).isTrue();
+		assertThat(response.getHeaders().getFirst(ACCESS_CONTROL_ALLOW_ORIGIN)).isEqualTo("*");
+		assertThat(response.getHeaders().get(VARY)).contains(ORIGIN,
+				ACCESS_CONTROL_REQUEST_METHOD, ACCESS_CONTROL_REQUEST_HEADERS);
+		assertThat((Object) response.getStatusCode()).isNull();
+	}
+
+	@Test
+	public void preflightRequestCredentialsWithOriginWildcardAndWhitelisted() throws Exception {
+		ServerWebExchange exchange = MockServerWebExchange.from(preFlightRequest()
+				.header(ACCESS_CONTROL_REQUEST_METHOD, "GET")
+				.header(ACCESS_CONTROL_REQUEST_HEADERS, "Header1"));
+
+		this.conf.addAllowedOrigin("https://domain1.com");
+		this.conf.addAllowedOrigin("*");
+		this.conf.addAllowedOrigin("https://domain2.com");
 		this.conf.addAllowedOrigin("http://domain3.example");
 		this.conf.addAllowedHeader("Header1");
 		this.conf.setAllowCredentials(true);
