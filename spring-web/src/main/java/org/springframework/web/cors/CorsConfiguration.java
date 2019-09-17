@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
@@ -49,6 +52,8 @@ import org.springframework.util.StringUtils;
  * @see <a href="https://www.w3.org/TR/cors/">CORS spec</a>
  */
 public class CorsConfiguration {
+
+	private static final Log logger = LogFactory.getLog(CorsConfiguration.class);
 
 	/** Wildcard representing <em>all</em> origins, methods, or headers. */
 	public static final String ALL = "*";
@@ -443,18 +448,18 @@ public class CorsConfiguration {
 			return null;
 		}
 
-		if (this.allowedOrigins.contains(ALL)) {
-			if (this.allowCredentials != Boolean.TRUE) {
-				return ALL;
-			}
-			else {
-				return requestOrigin;
-			}
-		}
 		for (String allowedOrigin : this.allowedOrigins) {
 			if (requestOrigin.equalsIgnoreCase(allowedOrigin)) {
 				return requestOrigin;
 			}
+		}
+
+		if (this.allowedOrigins.contains(ALL)) {
+			if (this.allowCredentials == Boolean.TRUE) {
+				logger.warn("Support for dynamically setting Access-Control-Allowed-Origin header with " +
+						"\"Access-Control-Allow-Credentials: true\" has been removed.");
+			}
+			return ALL;
 		}
 
 		return null;
