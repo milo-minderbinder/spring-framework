@@ -203,6 +203,12 @@ class CrossOriginAnnotationIntegrationTests extends AbstractRequestMappingIntegr
 		assertThat(entity.getHeaders().getAccessControlAllowOrigin()).isEqualTo("*");
 		assertThat(entity.getHeaders().getAccessControlAllowCredentials()).isFalse();
 		assertThat(entity.getBody()).isEqualTo("baz");
+
+		entity = performGet("/qux", this.headers, String.class);
+		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(entity.getHeaders().getAccessControlAllowOrigin()).isEqualTo("https://site1.com");
+		assertThat(entity.getHeaders().getAccessControlAllowCredentials()).isTrue();
+		assertThat(entity.getBody()).isEqualTo("qux");
 	}
 
 	@ParameterizedHttpServerTest
@@ -334,6 +340,14 @@ class CrossOriginAnnotationIntegrationTests extends AbstractRequestMappingIntegr
 		@GetMapping("/baz")
 		public String baz() {
 			return "baz";
+		}
+
+		@CrossOrigin(
+				origins = {"https://site1.com", "*"},
+				allowCredentials = "true")
+		@GetMapping("/qux")
+		public String qux() {
+			return "qux";
 		}
 	}
 

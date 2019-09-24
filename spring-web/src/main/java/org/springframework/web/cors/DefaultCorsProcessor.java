@@ -149,7 +149,8 @@ public class DefaultCorsProcessor implements CorsProcessor {
 				logger.warn("Cannot set Access-Control-Allow-Credentials header to \"true\" when " +
 						"Access-Control-Allow-Origin header is set to \"*\" " +
 						"(see note in section #6.1.3 of the specification: https://www.w3.org/TR/cors/#supports-credentials");
-			} else {
+			}
+			else {
 				responseHeaders.setAccessControlAllowCredentials(true);
 			}
 		}
