@@ -160,10 +160,10 @@ class GlobalCorsConfigIntegrationTests extends AbstractRequestMappingIntegration
 		this.headers.add(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "GET");
 		ResponseEntity<String> entity = performOptions("/ambiguous", this.headers, String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(entity.getHeaders().getAccessControlAllowOrigin()).isEqualTo("http://localhost:9000");
+		assertThat(entity.getHeaders().getAccessControlAllowOrigin()).isEqualTo("*");
 		assertThat(entity.getHeaders().getAccessControlAllowMethods())
 				.containsExactly(HttpMethod.GET);
-		assertThat(entity.getHeaders().getAccessControlAllowCredentials()).isEqualTo(true);
+		assertThat(entity.getHeaders().getAccessControlAllowCredentials()).isEqualTo(false);
 		assertThat(entity.getHeaders().get(HttpHeaders.VARY))
 				.containsExactly(HttpHeaders.ORIGIN, HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD,
 						HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS);

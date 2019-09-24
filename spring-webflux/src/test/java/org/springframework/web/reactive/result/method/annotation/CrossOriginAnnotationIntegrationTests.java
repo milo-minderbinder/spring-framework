@@ -200,8 +200,8 @@ class CrossOriginAnnotationIntegrationTests extends AbstractRequestMappingIntegr
 
 		entity = performGet("/baz", this.headers, String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(entity.getHeaders().getAccessControlAllowOrigin()).isEqualTo("https://site1.com");
-		assertThat(entity.getHeaders().getAccessControlAllowCredentials()).isTrue();
+		assertThat(entity.getHeaders().getAccessControlAllowOrigin()).isEqualTo("*");
+		assertThat(entity.getHeaders().getAccessControlAllowCredentials()).isFalse();
 		assertThat(entity.getBody()).isEqualTo("baz");
 	}
 
@@ -214,10 +214,10 @@ class CrossOriginAnnotationIntegrationTests extends AbstractRequestMappingIntegr
 		ResponseEntity<String> entity = performOptions("/ambiguous-header", this.headers, String.class);
 
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(entity.getHeaders().getAccessControlAllowOrigin()).isEqualTo("https://site1.com");
+		assertThat(entity.getHeaders().getAccessControlAllowOrigin()).isEqualTo("*");
 		assertThat(entity.getHeaders().getAccessControlAllowMethods().toArray()).isEqualTo(new HttpMethod[] {HttpMethod.GET});
 		assertThat(entity.getHeaders().getAccessControlAllowHeaders().toArray()).isEqualTo(new String[] {"header1"});
-		assertThat(entity.getHeaders().getAccessControlAllowCredentials()).isTrue();
+		assertThat(entity.getHeaders().getAccessControlAllowCredentials()).isFalse();
 	}
 
 	@ParameterizedHttpServerTest
@@ -228,9 +228,9 @@ class CrossOriginAnnotationIntegrationTests extends AbstractRequestMappingIntegr
 		ResponseEntity<String> entity = performOptions("/ambiguous-produces", this.headers, String.class);
 
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(entity.getHeaders().getAccessControlAllowOrigin()).isEqualTo("https://site1.com");
+		assertThat(entity.getHeaders().getAccessControlAllowOrigin()).isEqualTo("*");
 		assertThat(entity.getHeaders().getAccessControlAllowMethods().toArray()).isEqualTo(new HttpMethod[] {HttpMethod.GET});
-		assertThat(entity.getHeaders().getAccessControlAllowCredentials()).isTrue();
+		assertThat(entity.getHeaders().getAccessControlAllowCredentials()).isFalse();
 	}
 
 

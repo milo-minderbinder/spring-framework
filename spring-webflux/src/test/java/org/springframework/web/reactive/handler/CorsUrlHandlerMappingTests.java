@@ -136,9 +136,9 @@ public class CorsUrlHandlerMappingTests {
 		assertThat(actual).isNotNull();
 		assertThat(actual).isSameAs(this.welcomeController);
 		assertThat(exchange.getResponse().getHeaders()
-				.getFirst(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN)).isEqualTo("https://domain2.com");
+				.getFirst(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN)).isEqualTo("*");
 		assertThat(exchange.getResponse().getHeaders()
-				.getFirst(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS)).isEqualTo("true");
+				.getFirst(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS)).isEqualTo(null);
 	}
 
 	@Test
@@ -152,9 +152,9 @@ public class CorsUrlHandlerMappingTests {
 		assertThat(actual).isNotNull();
 		assertThat(actual).isNotSameAs(this.welcomeController);
 		assertThat(exchange.getResponse().getHeaders()
-				.getFirst(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN)).isEqualTo("https://domain2.com");
+				.getFirst(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN)).isEqualTo("*");
 		assertThat(exchange.getResponse().getHeaders()
-				.getFirst(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS)).isEqualTo("true");
+				.getFirst(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS)).isEqualTo(null);
 	}
 
 
